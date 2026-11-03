@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RRR FUND - Proyektor Ekrani</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b, #0f172a);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden; /* Ekranda ortiqcha skroll bo'lmasligi uchun */
+        }
+        .header {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            color: #38bdf8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .main-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            flex: 1;
+        }
+        .leaderboard-card, .feed-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Shohsupa (Pedestal) */
+        .pedestal {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 15px;
+            margin-bottom: 20px;
+            min-height: 220px;
+        }
+        .podium-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            border-radius: 16px 16px 8px 8px;
+            padding: 15px;
+            width: 32%;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .podium-1 { background: linear-gradient(180deg, #eab308, #ca8a04); height: 200px; order: 2; }
+        .podium-2 { background: linear-gradient(180deg, #94a3b8, #64748b); height: 160px; order: 1; }
+        .podium-3 { background: linear-gradient(180deg, #d97706, #b45309); height: 130px; order: 3; }
+        .podium-rank { font-size: 2rem; font-weight: 900; }
+        .podium-name { font-size: 1.3rem; font-weight: 800; margin: 5px 0; }
+        .podium-sales { font-size: 1rem; font-weight: 700; color: #fff; }
+
+        /* Jadval */
+        .sellers-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .sellers-table th { text-align: left; padding: 12px; color: #38bdf8; border-bottom: 2px solid rgba(255,255,255,0.1); font-size: 1rem; }
+        .sellers-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 1.1rem; }
+        
+        /* Lenta */
+        .feed-title { font-size: 1.3rem; color: #4ade80; margin-bottom: 15px; font-weight: bold; }
+        .feed-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .feed-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid #22c55e;
+            padding: 12px 15px;
+            border-radius: 10px;
+        }
+
+        /* =========================================
+           🎉 QALQIB CHIQUVCHI ANIMATSIYA (POP-UP)
+           ========================================= */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(5px);
+        }
+        .sale-popup {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            padding: 50px 80px;
+            border-radius: 30px;
+            box-shadow: 0 0 80px rgba(34, 197, 94, 0.6);
+            border: 3px solid #4ade80;
+            z-index: 1000;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Sakrash effekti */
+            pointer-events: none;
+        }
+        .overlay.active { opacity: 1; }
+        .sale-popup.active {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .popup-title { font-size: 2.5rem; color: #fff; margin-bottom: 15px; text-transform: uppercase; font-weight: bold; letter-spacing: 3px; }
+        .popup-name { font-size: 4.5rem; font-weight: 900; color: #fff; text-shadow: 3px 3px 15px rgba(0,0,0,0.4); margin: 15px 0; }
+        .popup-amount {
+            font-size: 4rem; color: #fef08a; font-weight: 900;
+            background: rgba(0,0,0,0.3); padding: 15px 40px;
+            border-radius: 20px; display: inline-block;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- YASHIRIN POP-UP OYNASI -->
+    <div class="overlay" id="popupOverlay"></div>
+    <div class="sale-popup" id="newSalePopup">
+        <div class="popup-title">🎉 YANGI SOTUV TASDIQLANDI! 🎉</div>
+        <div class="popup-name" id="popupName">Ism Familiya</div>
+        <div class="popup-amount" id="popupAmount">0 UZS</div>
+    </div>
+
+    <div class="header">
+        <h1>🏆 RRR FUND - SOTUVCHILAR REYTINGI 🏆</h1>
+    </div>
+
+    <div class="main-container">
+        <!-- Reyting va Shohsupa -->
+        <div class="leaderboard-card">
+            <div class="pedestal" id="pedestalContainer">
+                <div class="podium-box podium-2">
+                    <div class="podium-rank">🥈 2</div>
+                    <div class="podium-name" id="p2-name">-</div>
+                    <div class="podium-sales" id="p2-sales">0 UZS</div>
+                </div>
+                <div class="podium-box podium-1">
+                    <div class="podium-rank">🥇 1</div>
+                    <div class="podium-name" id="p1-name">-</div>
+                    <div class="podium-sales" id="p1-sales">0 UZS</div>
+                </div>
+                <div class="podium-box podium-3">
+                    <div class="podium-rank">🥉 3</div>
+                    <div class="podium-name" id="p3-name">-</div>
+                    <div class="podium-sales" id="p3-sales">0 UZS</div>
+                </div>
+            </div>
+
+            <table class="sellers-table">
+                <thead>
+                    <tr>
+                        <th>O'rin</th>
+                        <th>Xodim Ism Familiyasi</th>
+                        <th>Sotuvlar</th>
+                        <th>Umumiy Tushum</th>
+                        <th>Sprint</th>
+                    </tr>
+                </thead>
+                <tbody id="sellersTableBody">
+                    <tr><td colspan="5" style="text-align: center; color: #94a3b8;">Yuklanmoqda...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Oxirgi Tasdiqlangan Sotuvlar -->
+        <div class="feed-card">
+            <div class="feed-title">⚡ Oxirgi Tasdiqlangan Sotuvlar</div>
+            <ul class="feed-list" id="recentSalesFeed">
+                <li style="text-align: center; color: #94a3b8; padding: 20px;">Hozircha sotuvlar yo'q</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Animatsiyani boshqarish uchun o'zgaruvchilar
+        let lastApprovedSaleId = null;
+        let isFirstLoad = true;
+
+        // Qalqib chiquvchi oyna funksiyasi
+        window.triggerPopup = function(sellerName, amount) {
+            const popup = document.getElementById('newSalePopup');
+            const overlay = document.getElementById('popupOverlay');
+            
+            document.getElementById('popupName').innerText = sellerName;
+            document.getElementById('popupAmount').innerText = window.formatUZS ? window.formatUZS(amount) : amount + " UZS";
+            
+            popup.classList.add('active');
+            overlay.classList.add('active');
+            
+            // 6 soniyadan so'ng avtomat yopiladi
+            setTimeout(() => {
+                popup.classList.remove('active');
+                overlay.classList.remove('active');
+            }, 6000);
+        };
+
+        window.updateProjector = function() {
+            if (typeof window.getDB !== 'function') return;
+            const dbData = window.getDB();
+            if (!dbData || !dbData.sellers) return;
+
+            const formatUZS = window.formatUZS || function(amt) { return new Intl.NumberFormat('uz-UZ').format(Math.round(amt || 0)) + ' UZS'; };
+
+            // === 1. YANGI SOTUVNI TEKSHIRISH VA ANIMATSIYA ===
+            const requests = dbData.requests || [];
+            const approvedRequests = requests.filter(r => r.status === 'approved');
+            
+            if (approvedRequests.length > 0) {
+                const latestSale = approvedRequests[approvedRequests.length - 1]; // Eng oxirgi tasdiqlangan sotuv
+                
+                if (isFirstLoad) {
+                    lastApprovedSaleId = latestSale.id;
+                    isFirstLoad = false;
+                } else if (lastApprovedSaleId !== latestSale.id) {
+                    // YANGA SOTUV TOPILDI! EKRANGA QALQIB CHIQARAMIZ!
+                    window.triggerPopup(latestSale.seller, latestSale.amount);
+                    lastApprovedSaleId = latestSale.id;
+                }
+            } else {
+                isFirstLoad = false;
+            }
+
+            // === 2. XODIMLAR REYTINGI ===
+            const sellersArray = [];
+            for (const [name, data] of Object.entries(dbData.sellers)) {
+                sellersArray.push({ name: name, sales: data.sales || 0, revenue: data.revenue || 0, sprint: data.sprint || 0 });
+            }
+            sellersArray.sort((a, b) => b.revenue - a.revenue || b.sales - a.sales); // Tushum bo'yicha saralash
+
+            // === 3. SHOHSUPA (1, 2, 3 o'rinlar) ===
+            const updatePodium = (id, data) => {
+                document.getElementById(`p${id}-name`).innerText = data ? data.name : "-";
+                document.getElementById(`p${id}-sales`).innerText = data ? formatUZS(data.revenue) : "0 UZS";
+            };
+            updatePodium(1, sellersArray[0]);
+            updatePodium(2, sellersArray[1]);
+            updatePodium(3, sellersArray[2]);
+
+            // === 4. JADVAL ===
+            const tbody = document.getElementById('sellersTableBody');
+            tbody.innerHTML = '';
+            sellersArray.forEach((s, idx) => {
+                let badge = idx === 0 ? "🥇 1-o'rin" : (idx === 1 ? "🥈 2-o'rin" : (idx === 2 ? "🥉 3-o'rin" : `${idx + 1}-o'rin`));
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td style="font-weight: bold; color: #e2e8f0;">${badge}</td>
+                        <td style="font-weight: 900; color: #f8fafc; font-size: 1.2rem;">👤 ${s.name}</td>
+                        <td style="color: #4ade80; font-weight: bold;">${s.sales} ta</td>
+                        <td style="font-weight: bold; color: #38bdf8;">${formatUZS(s.revenue)}</td>
+                        <td>🔥 ${s.sprint} / 6</td>
+                    </tr>
+                `);
+            });
+
+            // === 5. SOTUVLAR LENTASI ===
+            const feedList = document.getElementById('recentSalesFeed');
+            if (approvedRequests.length > 0) {
+                feedList.innerHTML = '';
+                approvedRequests.slice().reverse().slice(0, 8).forEach(req => {
+                    feedList.insertAdjacentHTML('beforeend', `
+                        <li class="feed-item">
+                            <div style="display:flex; justify-content:space-between; font-weight:bold; color:#f8fafc; font-size:1.1rem;">
+                                <span>👤 ${req.seller}</span>
+                                <span style="color:#4ade80;">+${formatUZS(req.amount)}</span>
+                            </div>
+                        </li>
+                    `);
+                });
+            }
+        };
+
+        setInterval(() => { if (typeof window.updateProjector === 'function') window.updateProjector(); }, 1000);
+    </script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | RRR Fund</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
+            --primary: #2563eb; --primary-hover: #1d4ed8; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --border: #e2e8f0; --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="dark"] {
+            --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --border: #334155; --primary: #3b82f6; --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        [data-theme="green"] {
+            --bg-color: #f0fdf4; --card-bg: #ffffff; --primary: #16a34a; --primary-hover: #15803d;
+        }
+        [data-theme="purple"] {
+            --bg-color: #faf5ff; --card-bg: #ffffff; --primary: #9333ea; --primary-hover: #7e22ce;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding-bottom: 50px; transition: background-color 0.3s; }
+        
+        /* NAVBAR */
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: var(--card-bg); border-bottom: 1px solid var(--border); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+        .navbar h2 { margin: 0; font-size: 24px; font-weight: 800; color: var(--primary); }
+        .nav-actions { display: flex; gap: 15px; align-items: center; }
+        .nav-btn { padding: 10px 18px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main); font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .nav-btn:hover { border-color: var(--primary); }
+        .nav-btn.logout { background: var(--danger); color: white; border: none; }
+        .nav-btn.logout:hover { background: #dc2626; }
+
+        /* KONTENT */
+        .container { max-width: 1300px; margin: 40px auto; padding: 0 20px; }
+        
+        /* TABS (BO'LIMLAR) */
+        .admin-tabs { display: flex; gap: 15px; margin-bottom: 30px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+        .tab-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 12px 25px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 15px; }
+        .tab-btn.active, .tab-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: var(--shadow); }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+
+        /* KARTALAR VA JADVALLAR */
+        .card { background: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 30px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 30px; }
+        .stat-card { border-left: 5px solid var(--primary); }
+        .stat-card .value { font-size: 38px; font-weight: 900; margin-top: 10px; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 15px; border-bottom: 2px solid var(--border); color: var(--text-muted); text-transform: uppercase; font-size: 13px; }
+        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 15px; }
+
+        /* MODAL SOZLAMALAR */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: var(--card-bg); padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .close-btn { float: right; font-size: 24px; cursor: pointer; color: var(--text-muted); border: none; background: none; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); font-size: 14px; }
+        .form-group input { width: 100%; padding: 15px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-color); color: var(--text-main); font-size: 16px; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <h2>🏢 RRR FUND <span style="font-size: 16px; color: var(--text-muted);">| Admin Markazi</span></h2>
+        <div class="nav-actions">
+            <!-- Tema almashtirish -->
+            <select id="themeSelector" class="nav-btn" onchange="changeTheme(this.value)">
+                <option value="light">☀️ Oq tema</option>
+                <option value="dark">🌙 Qora tema</option>
+                <option value="green">🌿 Yashil tema</option>
+                <option value="purple">🟣 Binafsha tema</option>
+            </select>
+
+            <a href="projector.html" target="_blank" class="nav-btn" style="background: rgba(37, 99, 235, 0.1); color: var(--primary);">🖥️ Proyektor ↗</a>
+            <button class="nav-btn" onclick="openSettingsModal()">⚙️ Sozlamalar</button>
+            <button class="nav-btn logout" onclick="window.logout()">🚪 Chiqish</button>
+        </div>
+    </nav>
+
+    <!-- ASOSIY QISM (TABLAR) -->
+    <div class="container">
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboardTab', this)">📊 Umumiy Statistika</button>
+            <button class="tab-btn" onclick="switchTab('approvalsTab', this)">📥 Tasdiqlash Markazi</button>
+            <button class="tab-btn" onclick="switchTab('sellersTab', this)">👥 Xodimlar Reytingi</button>
+        </div>
+
+        <!-- 1. STATISTIKA TABI -->
+        <div id="dashboardTab" class="admin-section active">
+            <div class="grid-3" id="dashboard">
+                <div class="card stat-card" style="border-left-color: var(--success);">
+                    <h3 style="margin: 0; color: var(--text-muted); font-size: 14px;">JAMI KASSA TUSHUMI</h3>
+                    <div class="value" style="color: var(--success);">0 UZS</div>
+                </div>
+                <div class="card stat-card" style="border-left-color: var(--primary);">
+                    <h3 style="margin: 0; color: var(--text-muted); font-size: 14px;">JAMI SOTUVLAR</h3>
+                    <div class="value" style="color: var(--primary);">0 ta</div>
+                </div>
+                <div class="card stat-card" style="border-left-color: var(--warning);">
+                    <h3 style="margin: 0; color: var(--text-muted); font-size: 14px;">O'RTACHA KONVERSIYA</h3>
+                    <div class="value" style="color: var(--warning);">⚡ 0%</div>
+                </div>
+            </div>
+
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin: 0; font-size: 20px;">📅 Oylik Hisobot va Boshqaruv</h3>
+                    <p style="margin: 5px 0 0 0; color: var(--text-muted);">Excelga ko'chirib olish yoki yangi oyni boshlash</p>
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <button onclick="window.exportToExcel()" class="nav-btn" style="background: var(--success); color: white; border: none;">📊 Excelga Yuklash</button>
+                    <button onclick="window.resetSprint()" class="nav-btn" style="background: var(--warning); color: white; border: none;">🏁 Sprintni 0 Qilish</button>
+                    <button onclick="window.resetMonth()" class="nav-btn logout">🔄 Oyni Yopish (0 qilish)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TASDIQLASH TABI -->
+        <div id="approvalsTab" class="admin-section">
+            <div class="card">
+                <h3 style="margin-top: 0; font-size: 20px; margin-bottom: 20px;">📥 Kutilayotgan Cheklar va So'rovlar</h3>
+                <ul class="history-list" id="approvalsList" style="list-style: none; padding: 0; margin: 0;"></ul>
+            </div>
+        </div>
+
+        <!-- 3. XODIMLAR TABI -->
+        <div id="sellersTab" class="admin-section">
+            <div class="card" id="sellersListContainer">
+                <h3 style="margin-top: 0; font-size: 20px; margin-bottom: 20px;">👥 Xodimlar Holati</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Sotuvchi F.I.O</th>
+                            <th>Sotuvlar Soni</th>
+                            <th>Keltirgan Tushumi</th>
+                            <th>Konversiya</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOZLAMALAR MODAL OYNASI -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+            <h3 style="margin-top: 0; font-size: 20px; margin-bottom: 20px;">⚙️ Admin Sozlamalari</h3>
+            
+            <div class="form-group">
+                <label>Yangi Login:</label>
+                <input type="text" id="newLoginInp" placeholder="Yangi login">
+            </div>
+            
+            <div class="form-group">
+                <label>Yangi Parol:</label>
+                <input type="text" id="newPassInp" placeholder="Yangi parol">
+            </div>
+
+            <button class="btn-submit" onclick="window.saveSettingsCustom()">💾 Saqlash</button>
+        </div>
+    </div>
+
+    <script>
+        // Tablar bo'yicha almashtirish
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.admin-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // Tema tanlash
+        function changeTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('crmTheme', themeName);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('crmTheme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeSelector').value = savedTheme;
+        });
+
+        function openSettingsModal() { document.getElementById('settingsModal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+    </script>
+    
+    <script type="module" src="app.js"></script>
+</body>
+</html>

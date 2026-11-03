@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirish | RRR Fund CRM</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); }
+        .login-card { width: 100%; max-width: 420px; padding: 50px 40px; text-align: center; }
+        .login-card h2 { font-size: 32px; margin-bottom: 10px; }
+        .login-card p { color: var(--text-muted); margin-bottom: 35px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="card login-card">
+        <h2>🏢 RRR FUND</h2>
+        <p>Yopiq CRM tizimiga xush kelibsiz</p>
+        <form onsubmit="window.loginToSystem(event)">
+            <div class="form-group">
+                <input type="text" id="usernameInp" placeholder="Login (masalan: admin)" autocomplete="off" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="passwordInp" placeholder="Parol" required>
+            </div>
+            <button type="submit" class="btn-submit" style="padding: 18px; font-size: 18px;">Tizimga Kirish 🚀</button>
+        </form>
+    </div>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

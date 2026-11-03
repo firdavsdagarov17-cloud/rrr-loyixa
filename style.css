@@ -1,0 +1,135 @@
+/* =========================================
+   PRO CRM - ZAMONAVIY DIZAYN & PALITRA
+========================================= */
+
+:root, [data-theme="ocean"] {
+    --bg-color: #0b1120;
+    --card-bg: #1e293b;
+    --card-bg-hover: #273548;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary-color: #38bdf8;
+    --primary-hover: #0ea5e9;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --border-color: #334155;
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] {
+    --bg-color: #09090b;
+    --card-bg: #18181b;
+    --card-bg-hover: #27272a;
+    --text-main: #fafafa;
+    --text-muted: #a1a1aa;
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --success-color: #22c55e;
+    --warning-color: #eab308;
+    --danger-color: #dc2626;
+    --border-color: #27272a;
+    --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] {
+    --bg-color: #f1f5f9;
+    --card-bg: #ffffff;
+    --card-bg-hover: #f8fafc;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --primary-color: #0284c7;
+    --primary-hover: #0369a1;
+    --success-color: #059669;
+    --warning-color: #d97706;
+    --danger-color: #dc2626;
+    --border-color: #e2e8f0;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="gold"] {
+    --bg-color: #050505;
+    --card-bg: #121212;
+    --card-bg-hover: #1a1a1a;
+    --text-main: #fef08a;
+    --text-muted: #ca8a04;
+    --primary-color: #eab308;
+    --primary-hover: #ca8a04;
+    --success-color: #10b981;
+    --border-color: #422006;
+    --card-shadow: 0 10px 25px -5px rgba(234, 179, 8, 0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; }
+
+body { 
+    background-color: var(--bg-color); 
+    color: var(--text-main); 
+    transition: background-color 0.3s ease, color 0.3s ease; 
+}
+
+/* Umumiy elementlar */
+.card { 
+    background-color: var(--card-bg); 
+    padding: 24px; 
+    border-radius: 16px; 
+    box-shadow: var(--card-shadow); 
+    border: 1px solid var(--border-color); 
+    transition: transform 0.2s ease;
+}
+
+.card h2 { 
+    font-size: 18px; 
+    font-weight: 600; 
+    color: var(--text-main); 
+    margin-bottom: 15px; 
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Form elementlari */
+select, input { 
+    padding: 10px 14px; 
+    border-radius: 8px; 
+    background: var(--bg-color); 
+    color: var(--text-main); 
+    border: 1px solid var(--border-color); 
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+select:focus, input:focus { border-color: var(--primary-color); }
+
+.btn-submit { 
+    padding: 10px 20px; 
+    background: var(--primary-color); 
+    color: #fff; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    font-weight: 600; 
+    transition: background 0.2s; 
+}
+.btn-submit:hover { background: var(--primary-hover); }
+
+/* Jadval dizayni */
+table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 10px; }
+th { padding: 14px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 2px solid var(--border-color); }
+td { padding: 16px 14px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+tr:hover { background-color: var(--card-bg-hover); }
+
+/* Tarix elementlari */
+.history-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.history-item { 
+    padding: 16px; 
+    background: var(--bg-color);
+    border-radius: 12px; 
+    border: 1px solid var(--border-color);
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+.history-item.pending { border-left: 4px solid var(--warning-color); }
+.history-item.approved { border-left: 4px solid var(--success-color); }

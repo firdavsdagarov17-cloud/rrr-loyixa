@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sotuvchi Kabineti | RRR Fund</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ================= TEMA VA RANGLAR ================= */
+        :root {
+            --bg-color: #f1f5f9; --card-bg: #ffffff; --text-main: #1e293b; --text-muted: #64748b;
+            --primary: #0ea5e9; --primary-hover: #0284c7; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --border: #e2e8f0; --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="dark"] {
+            --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --border: #334155; --primary: #3b82f6; --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        [data-theme="green"] {
+            --bg-color: #f0fdf4; --card-bg: #ffffff; --primary: #16a34a; --primary-hover: #15803d;
+        }
+
+        /* ================= ASOSIY DIZAYN ================= */
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; min-height: 100vh; transition: 0.3s; }
+        
+        /* NAVBAR (TEPA QISM) */
+        .top-navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: var(--card-bg); border-bottom: 1px solid var(--border); box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
+        .top-navbar h2 { margin: 0; font-size: 26px; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
+        .nav-actions { display: flex; gap: 15px; align-items: center; }
+        .nav-btn { padding: 12px 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-color); color: var(--text-main); font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .nav-btn:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .nav-btn.logout { background: var(--danger); color: white; border: none; }
+        .nav-btn.logout:hover { background: #dc2626; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+
+        /* KONTENT (O'RTA QISM) */
+        .container { max-width: 1300px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .card { background: var(--card-bg); padding: 35px; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 30px; transition: 0.3s; }
+        .card:hover { transform: translateY(-5px); }
+        .card-title { margin-top: 0; font-size: 22px; font-weight: 800; border-bottom: 2px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; color: var(--text-main); }
+        
+        /* BALANS VA SONLAR */
+        .balance-amount { font-size: 54px; font-weight: 900; color: var(--success); margin-bottom: 25px; letter-spacing: -1px; }
+        .balance-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed var(--border); font-size: 17px; }
+        
+        /* FORMALAR */
+        .form-group { margin-bottom: 22px; }
+        .form-group label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--text-muted); font-size: 15px; }
+        .form-group input, .form-group select { width: 100%; padding: 16px; border-radius: 14px; border: 2px solid var(--border); background: var(--bg-color); color: var(--text-main); font-size: 16px; font-family: 'Inter', sans-serif; box-sizing: border-box; transition: 0.3s; font-weight: 500; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15); }
+        .btn-submit { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: 800; cursor: pointer; transition: 0.3s; margin-top: 15px; }
+        .btn-submit:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(14, 165, 233, 0.3); }
+
+        /* TARIX RO'YXATI */
+        .history-list { list-style: none; padding: 0; margin: 0; max-height: 500px; overflow-y: auto; }
+        .history-item { padding: 20px; border-radius: 16px; border: 1px solid var(--border); background: var(--bg-color); margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; transition: 0.2s; }
+        .history-item:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        /* SOZLAMALAR MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: var(--card-bg); padding: 40px; border-radius: 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid var(--border); }
+        .close-btn { float: right; font-size: 28px; cursor: pointer; color: var(--text-muted); border: none; background: none; margin-top: -10px; transition: 0.2s; }
+        .close-btn:hover { color: var(--danger); }
+        
+        /* BONUS QOIDALARI UCHUN KICHIK MATN */
+        .bonus-hint { font-size: 13px; color: var(--success); font-weight: 600; margin-top: 8px; display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- TEPADAGI NAVBAR -->
+    <nav class="top-navbar">
+        <h2>🏢 RRR FUND <span style="font-size: 18px; color: var(--text-muted); font-weight: 600;">| Sotuvchi Kabineti</span></h2>
+        <div class="nav-actions">
+            <!-- Tema tanlash -->
+            <select id="themeSelector" class="nav-btn" onchange="changeTheme(this.value)">
+                <option value="light">☀️ Kunduzgi</option>
+                <option value="dark">🌙 Tungi</option>
+                <option value="green">🌿 Yashil</option>
+            </select>
+            
+            <div style="background: var(--bg-color); padding: 12px 25px; border-radius: 12px; font-weight: 800; border: 1px solid var(--border); font-size: 15px;">
+                👤 <span id="sellerNameDisplay">Sotuvchi</span>
+            </div>
+            
+            <button class="nav-btn" onclick="openSettingsModal()">⚙️ Sozlamalar</button>
+            <button class="nav-btn logout" onclick="window.logout()">🚪 Chiqish</button>
+        </div>
+    </nav>
+
+    <!-- ASOSIY QISM -->
+    <div class="container">
+        
+        <!-- CHAP USTUN (Balans va Sotuv qo'shish) -->
+        <div class="left-column">
+            <!-- 1. Shaxsiy Balans -->
+            <div class="card">
+                <h3 class="card-title">💰 Joriy Oylik Maoshingiz</h3>
+                <div class="balance-amount" id="sellerBalanceVal">0 UZS</div>
+                <div class="balance-row">
+                    <span style="color: var(--text-muted); font-weight: 600;">Fiks maosh:</span>
+                    <strong id="sellerFixedVal">3,000,000 UZS</strong>
+                </div>
+                <div class="balance-row">
+                    <span style="color: var(--text-muted); font-weight: 600;">Ishlangan Bonuslar:</span>
+                    <strong id="sellerBonusVal" style="color: var(--success); font-size: 20px;">+ 0 UZS</strong>
+                </div>
+            </div>
+
+            <!-- 2. Yangi Sotuv Kiritish -->
+            <div class="card">
+                <h3 class="card-title">➕ Yangi Chek Yuborish</h3>
+                <form id="saleForm" onsubmit="window.handleNewSale(event)">
+                    
+                    <div class="form-group">
+                        <label>Mijoz Ism-Familiyasi:</label>
+                        <input type="text" id="clientNameInput" placeholder="Mijozning to'liq ismini kiriting" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kurs qayerda o'qishini tanlang:</label>
+                        <select id="courseTypeInput" onchange="window.previewBonus()" required>
+                            <!-- Bonus qoidalari xodimga aniq ko'rinib turadi -->
+                            <option value="offline_buxoro">🏢 Oflayn - Buxoro (1 mln = 150k | >1 mln = 250k)</option>
+                            <option value="offline_toshkent">🏢 Oflayn - Toshkent (1 mln = 150k | >1 mln = 250k)</option>
+                            <option value="online">💻 Onlayn (1 mln = 100k | >1 mln = 150k)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>To'lov summasi (Chek summasi):</label>
+                        <input type="number" id="saleAmountInput" placeholder="Masalan: 1000000" oninput="window.previewBonus()" required>
+                        <!-- Kiritilgan summaga qarab qancha bonus olishi shu yerda ko'rinadi -->
+                        <div id="bonusPreview" style="color: var(--success); font-weight: 800; margin-top: 10px; font-size: 16px;"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>O'qishni boshlash sanasi:</label>
+                        <input type="date" id="startDateInput" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit">🚀 Rahbariyatga Yuborish</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- O'NG USTUN (Sprint va Tarix) -->
+        <div class="right-column">
+            <!-- 3. Haftalik Sprint -->
+            <div class="card" style="border: 2px solid var(--primary);">
+                <h3 class="card-title" style="border-bottom: none; margin-bottom: 10px;">🏃‍♂️ Haftalik Sprint Poygasi</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span style="font-weight: 700; color: var(--text-muted); font-size: 15px;">Dushanba - Shanba natijasi:</span>
+                    <strong id="sprintTextVal" style="font-size: 28px; color: var(--primary); font-weight: 900;">0 / 6</strong>
+                </div>
+                
+                <div style="width: 100%; height: 24px; background: var(--bg-color); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                    <div id="sprintBarVal" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--success)); transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                </div>
+                
+                <!-- Sprint qoidalari aniq yozib qo'yildi -->
+                <div style="margin-top: 15px; padding: 15px; background: rgba(14, 165, 233, 0.1); border-radius: 12px; border: 1px solid rgba(14, 165, 233, 0.2);">
+                    <p style="margin: 0; font-size: 14px; color: var(--text-main); line-height: 1.6;">
+                        <b style="color: var(--primary);">🏆 SPRINT QOIDASI:</b><br> 
+                        6 ta sotuvni yopgan <br>
+                        🥇 <b>1-xodimga</b> = 500,000 so'm<br>
+                        🥈🥉 <b>2 va 3-xodimlarga</b> = 300,000 so'm<br>
+                        🏅 <b>Qolgan barchaga</b> = 200,000 so'm bonus beriladi!
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4. Sotuvlar Tarixi -->
+            <div class="card">
+                <h3 class="card-title">📋 Mening Tarixim va Bonuslarim</h3>
+                <ul class="history-list" id="mySalesHistoryList">
+                    <!-- Javascript orqali to'ldiriladi -->
+                    <div style="text-align: center; color: var(--text-muted); padding: 40px 0; font-weight: 500;">
+                        Hozircha sotuvlar tarixi mavjud emas
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOZLAMALAR MODAL OYNASI -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+            <h3 class="card-title" style="margin-bottom: 25px;">⚙️ Profil Sozlamalari</h3>
+            
+            <div class="form-group">
+                <label>Yangi Login kiriting:</label>
+                <input type="text" id="newLoginInp" placeholder="Yangi login">
+            </div>
+            
+            <div class="form-group">
+                <label>Yangi Parol kiriting:</label>
+                <input type="text" id="newPassInp" placeholder="Yangi parol">
+            </div>
+
+            <button class="btn-submit" onclick="window.saveSettingsCustom()">💾 Saqlash</button>
+        </div>
+    </div>
+
+    <!-- UI SKRIPTLAR -->
+    <script>
+        function changeTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('crmTheme', themeName);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('crmTheme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeSelector').value = savedTheme;
+        });
+
+        function openSettingsModal() { document.getElementById('settingsModal').style.display = 'flex'; }
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+    </script>
+
+    <!-- FIREBASE BOG'LANISHI -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
